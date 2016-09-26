@@ -1,0 +1,4 @@
+cffi==1.8.3
+pycparser==2.14
+pygit2==0.24.1
+six==1.10.0
