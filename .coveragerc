@@ -1,0 +1,13 @@
+[run]
+branch = True
+source =
+    git_whatsup
+
+[paths]
+source =
+   src/git_whatsup
+   .tox/*/lib/python*/site-packages/git_whatsup
+   .tox/pypy/site-packages/git_whatsup
+
+[report]
+show_missing = True

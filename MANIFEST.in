@@ -1,0 +1,2 @@
+include *.txt LICENSE README.md tox.ini .travis.yml .pygit2_travis.sh .coveragerc
+recursive-include tests *.py

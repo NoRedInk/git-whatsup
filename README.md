@@ -7,7 +7,7 @@ Requires Python 3.5+ and pygit2.
 ```
 $ python whatsup.py .
 conflicts with me
-============================================================
+------------------------------------------------------------
 origin/find-the-leaks (M!)
    spec/spec_helper.rb C
    app/assets/cactus.png deleted by us
