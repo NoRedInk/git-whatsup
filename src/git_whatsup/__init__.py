@@ -48,9 +48,10 @@ def main(argv: Optional[List[str]] = None) -> None:
                         help='compare against branches in this remote')
     parser.add_argument('--master', metavar='BRANCH_NAME', default='master',
                         help='master branch name')
-    parser.add_argument('--include', '-i', metavar='BRANCH_NAME',
-                        dest='includes', action='append',
-                        help='branches to check')
+    parser.add_argument('--branch', '-b', metavar='BRANCH_NAME',
+                        dest='branches', action='append',
+                        help=('branches to check. by default, '
+                              'all branches are checked'))
     parser.add_argument('--all', '-a', default=False,
                         dest='all_statuses', action='store_true',
                         help='output all statuses if output format is `plain`')

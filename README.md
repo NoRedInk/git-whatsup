@@ -5,7 +5,9 @@ List up remote branches that conflict with the current working copy.
 Requires Python 3.5+ and pygit2.
 
 ```
-$ python whatsup.py .
+$ brew install libgit2
+$ pip install git-whatsup
+$ git-whatsup
 conflicts with me
 ------------------------------------------------------------
 origin/find-the-leaks (M!)
@@ -29,11 +31,11 @@ How it works:
 ## Usage
 
 ```
-$ python whatsup.py -h
-usage: whatsup.py [-h] [--remote REMOTE_NAME] [--master BRANCH_NAME]
-                  [--include BRANCH_NAME] [--all] [--diff]
-                  [--format {plain,json}]
-                  [repo_path]
+$ git-whatsup --help
+usage: git-whatsup [-h] [--remote REMOTE_NAME] [--master BRANCH_NAME]
+                   [--branch BRANCH_NAME] [--all] [--diff]
+                   [--format {plain,json}]
+                   [repo_path]
 
 List up remote branches that conflict with the current working copy.
 
@@ -44,10 +46,11 @@ optional arguments:
   -h, --help            show this help message and exit
   --remote REMOTE_NAME  compare against branches in this remote
   --master BRANCH_NAME  master branch name
-  --include BRANCH_NAME, -i BRANCH_NAME
-                        branches to check
-  --all, -a             output all branch statuses
-  --diff, -d            output diffs if output format is plain
+  --branch BRANCH_NAME, -b BRANCH_NAME
+                        branches to check. by default, all branches are
+                        checked
+  --all, -a             output all statuses if output format is `plain`
+  --diff, -d            output diffs if output format is `plain`
   --format {plain,json}, -f {plain,json}
                         json always includes diffs
 ```
