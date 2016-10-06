@@ -1,0 +1,46 @@
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+language: python
+
+
+python:
+  - 3.5
+
+
+env:
+  global:
+    # from pygit2's .travis.yml
+    - LIBGIT2=~/libgit2/_install/
+    - LD_LIBRARY_PATH=~/libgit2/_install/lib
+  matrix:
+    - TOXENV=sanity
+    - TOXENV=testpy3
+    # Meta
+    - TOXENV=flake8
+    - TOXENV=manifest
+
+
+install:
+  - pip install tox
+
+
+script:
+  - tox
+
+
+before_install:
+  - pip install codecov
+  # from pygit2's .travis.yml
+  - sudo apt-get install cmake
+  - pip install cffi
+  - "./.pygit2_travis.sh"
+
+after_success:
+  - tox -e coverage-report
+  - codecov
+
+
+notifications:
+  email: false
