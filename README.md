@@ -1,5 +1,7 @@
 # git-whatsup
 
+[![Build Status](https://travis-ci.org/NoRedInk/git-whatsup.svg?branch=master)](https://travis-ci.org/NoRedInk/git-whatsup)
+
 List up remote branches that conflict with the current working copy.
 
 Requires Python 3.5+ and pygit2.
