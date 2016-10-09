@@ -30,17 +30,6 @@ def _list_remote_branches(
         yield repo.lookup_branch(branch_name, pygit2.GIT_BRANCH_REMOTE)
 
 
-def _prune_branch_statuses(
-        branch_statuses: [BranchStatus],
-        all_statuses: bool = False) -> Iterator[BranchStatus]:
-    for branch_status in branch_statuses:
-        if not all_statuses and \
-           branch_status.merge_status != MergeStatus.conflicts_with_me:
-            continue
-
-        yield branch_status
-
-
 def main(argv: Optional[List[str]] = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('repo_path', default='.', nargs='?',
@@ -78,12 +67,12 @@ def main(argv: Optional[List[str]] = None) -> None:
         branches = _list_remote_branches(repo, args.remote)
 
     branch_statuses = preview.get_branch_statuses(repo, master, branches)
-    pruned_output = _prune_branch_statuses(branch_statuses, args.all_statuses)
 
-    if args.output_format == OutputFormat.plain:
-        output.print_plain(pruned_output, args.output_diffs)
-    elif args.output_format == OutputFormat.json:
-        output.print_json(pruned_output)
+    output.print_branches(
+        branch_statuses,
+        args.output_format,
+        args.output_diffs,
+        args.all_statuses)
 
     has_conflicts_with_me = any(
         branch.merge_status == MergeStatus.conflicts_with_me

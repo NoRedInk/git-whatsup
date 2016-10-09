@@ -1,12 +1,26 @@
 import sys
-from typing import Dict, List
+from typing import Dict, List, Iterator
 from enum import Enum
 import operator
 import itertools
 import json
 import textwrap
 
-from .datastructures import BranchStatus, MergeStatus, ConflictType
+from .datastructures import (
+    BranchStatus, MergeStatus, ConflictType, OutputFormat)
+
+
+def print_branches(
+        branch_statuses: [BranchStatus],
+        output_format: OutputFormat,
+        output_diffs: bool,
+        include_all: bool) -> None:
+    pruned_output = _prune_branch_statuses(branch_statuses, include_all)
+
+    if output_format == OutputFormat.plain:
+        print_plain(pruned_output, output_diffs)
+    elif output_format == OutputFormat.json:
+        print_json(pruned_output)
 
 
 def print_json(branch_statuses: [BranchStatus]) -> None:
@@ -96,6 +110,17 @@ def jsonify(o):
     if isinstance(o, dict):
         return {jsonify(k): jsonify(v) for k, v in o.items()}
     return o
+
+
+def _prune_branch_statuses(
+        branch_statuses: [BranchStatus],
+        include_all: bool = False) -> Iterator[BranchStatus]:
+    for branch_status in branch_statuses:
+        if not include_all and \
+           branch_status.merge_status != MergeStatus.conflicts_with_me:
+            continue
+
+        yield branch_status
 
 
 def _group_branch_statuses(
