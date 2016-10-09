@@ -10,6 +10,7 @@ import pygit2
 from .datastructures import BranchStatus, MergeStatus, OutputFormat
 from . import output
 from . import preview
+from .version import __version__  # noqa: F401
 
 
 def _list_remote_branches(
