@@ -7,9 +7,10 @@ import argparse
 
 import pygit2
 
-from .datastructures import BranchStatus, MergeStatus, OutputFormat
+from .datastructures import MergeStatus, OutputFormat
 from . import output
 from . import preview
+from . import working_copy
 from .version import __version__  # noqa: F401
 
 
@@ -66,7 +67,9 @@ def main(argv: Optional[List[str]] = None) -> None:
     else:
         branches = _list_remote_branches(repo, args.remote)
 
-    branch_statuses = preview.get_branch_statuses(repo, master, branches)
+    working_copy_oid = working_copy.commit_to_working_copy_tag(repo)
+    branch_statuses = preview.get_branch_statuses(
+        repo, working_copy_oid, master, branches)
 
     output.print_branches(
         branch_statuses,

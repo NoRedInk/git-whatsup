@@ -7,7 +7,6 @@ from .datastructures import (
     BranchStatus,
     MergeStatus, MergeResult,
     Conflict, ConflictType)
-from . import working_copy
 
 
 CONFLICTING_DIFF_RE = re.compile(
@@ -16,22 +15,22 @@ CONFLICTING_DIFF_RE = re.compile(
 
 def get_branch_statuses(
         repo: pygit2.Repository,
+        us: pygit2.Oid,
         master: pygit2.Branch,
         branches: [pygit2.Branch]) -> [BranchStatus]:
-    working_copy_oid = working_copy.commit_to_working_copy_tag(repo)
     return [
         get_branch_status(
             repo,
-            working_copy_oid,
-            branch,
-            master) for branch in branches]
+            us,
+            master,
+            branch) for branch in branches]
 
 
 def get_branch_status(
         repo: pygit2.Repository,
         us: pygit2.Oid,
-        them: pygit2.Branch,
-        master: pygit2.Branch) -> BranchStatus:
+        master: pygit2.Branch,
+        them: pygit2.Branch) -> BranchStatus:
     no_conflict_statuses = (MergeStatus.no_common_ancestor,
                             MergeStatus.no_conflicts)
 
