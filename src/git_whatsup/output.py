@@ -1,4 +1,5 @@
 import sys
+import types
 from typing import Dict, List, Iterator
 from enum import Enum
 import operator
@@ -13,8 +14,8 @@ from .datastructures import (
 def print_branches(
         branch_statuses: [BranchStatus],
         output_format: OutputFormat,
-        output_diffs: bool,
-        include_all: bool) -> None:
+        output_diffs: bool = False,
+        include_all: bool = False) -> None:
     pruned_output = _prune_branch_statuses(branch_statuses, include_all)
 
     if output_format == OutputFormat.plain:
@@ -25,6 +26,9 @@ def print_branches(
 
 def print_json(branch_statuses: [BranchStatus]) -> None:
     '''Print all branches as a JSON array.
+
+    Always prints conflicting diffs, if any, because it was
+    simpler to implement.
     '''
     json.dump(jsonify(branch_statuses), sys.stdout)
     print('')
@@ -105,7 +109,7 @@ def jsonify(o):
         return o.name
     if hasattr(o, '_asdict'):
         return {jsonify(k): jsonify(v) for k, v in o._asdict().items()}
-    if isinstance(o, (list, tuple, set)):
+    if isinstance(o, (list, tuple, set, types.GeneratorType)):
         return list(map(jsonify, o))
     if isinstance(o, dict):
         return {jsonify(k): jsonify(v) for k, v in o.items()}
