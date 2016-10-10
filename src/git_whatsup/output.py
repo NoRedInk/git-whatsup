@@ -1,16 +1,34 @@
 import sys
-from typing import Dict, List
+import types
+from typing import Dict, List, Iterator
 from enum import Enum
 import operator
 import itertools
 import json
 import textwrap
 
-from .datastructures import BranchStatus, MergeStatus, ConflictType
+from .datastructures import (
+    BranchStatus, MergeStatus, ConflictType, OutputFormat)
+
+
+def print_branches(
+        branch_statuses: [BranchStatus],
+        output_format: OutputFormat,
+        output_diffs: bool = False,
+        include_all: bool = False) -> None:
+    pruned_output = _prune_branch_statuses(branch_statuses, include_all)
+
+    if output_format == OutputFormat.plain:
+        print_plain(pruned_output, output_diffs)
+    elif output_format == OutputFormat.json:
+        print_json(pruned_output)
 
 
 def print_json(branch_statuses: [BranchStatus]) -> None:
     '''Print all branches as a JSON array.
+
+    Always prints conflicting diffs, if any, because it was
+    simpler to implement.
     '''
     json.dump(jsonify(branch_statuses), sys.stdout)
     print('')
@@ -91,11 +109,22 @@ def jsonify(o):
         return o.name
     if hasattr(o, '_asdict'):
         return {jsonify(k): jsonify(v) for k, v in o._asdict().items()}
-    if isinstance(o, (list, tuple, set)):
+    if isinstance(o, (list, tuple, set, types.GeneratorType)):
         return list(map(jsonify, o))
     if isinstance(o, dict):
         return {jsonify(k): jsonify(v) for k, v in o.items()}
     return o
+
+
+def _prune_branch_statuses(
+        branch_statuses: [BranchStatus],
+        include_all: bool = False) -> Iterator[BranchStatus]:
+    for branch_status in branch_statuses:
+        if not include_all and \
+           branch_status.merge_status != MergeStatus.conflicts_with_me:
+            continue
+
+        yield branch_status
 
 
 def _group_branch_statuses(

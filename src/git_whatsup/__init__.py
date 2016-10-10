@@ -7,9 +7,11 @@ import argparse
 
 import pygit2
 
-from .datastructures import BranchStatus, MergeStatus, OutputFormat
+from .datastructures import MergeStatus, OutputFormat
 from . import output
 from . import preview
+from . import working_copy
+from .version import __version__  # noqa: F401
 
 
 def _list_remote_branches(
@@ -27,17 +29,6 @@ def _list_remote_branches(
         if exclude_remote_of_head and branch_name == remote_of_local_head:
             continue
         yield repo.lookup_branch(branch_name, pygit2.GIT_BRANCH_REMOTE)
-
-
-def _prune_branch_statuses(
-        branch_statuses: [BranchStatus],
-        all_statuses: bool = False) -> Iterator[BranchStatus]:
-    for branch_status in branch_statuses:
-        if not all_statuses and \
-           branch_status.merge_status != MergeStatus.conflicts_with_me:
-            continue
-
-        yield branch_status
 
 
 def main(argv: Optional[List[str]] = None) -> None:
@@ -76,13 +67,15 @@ def main(argv: Optional[List[str]] = None) -> None:
     else:
         branches = _list_remote_branches(repo, args.remote)
 
-    branch_statuses = preview.get_branch_statuses(repo, master, branches)
-    pruned_output = _prune_branch_statuses(branch_statuses, args.all_statuses)
+    working_copy_oid = working_copy.commit_to_working_copy_tag(repo)
+    branch_statuses = preview.get_branch_statuses(
+        repo, working_copy_oid, master, branches)
 
-    if args.output_format == OutputFormat.plain:
-        output.print_plain(pruned_output, args.output_diffs)
-    elif args.output_format == OutputFormat.json:
-        output.print_json(pruned_output)
+    output.print_branches(
+        branch_statuses,
+        args.output_format,
+        args.output_diffs,
+        args.all_statuses)
 
     has_conflicts_with_me = any(
         branch.merge_status == MergeStatus.conflicts_with_me
